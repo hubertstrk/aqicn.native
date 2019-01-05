@@ -1,5 +1,5 @@
 <template>
-  <Label :text="text" class="label" :class="{small: small, medium: medium, large: large}"/>
+  <Label textWrap="true" :text="text" class="label" :class="{small: small, medium: medium, large: large}"/>
 </template>
 
 <script>
@@ -15,8 +15,7 @@ export default {
 
 <style lang="css" scoped>
 .label {
-  color: white;
-  font-family: 'Montserrat-Light';
+  padding: 1px 5px;
 }
 .small {font-size: 12px;}
 .medium {font-size: 18px;}
