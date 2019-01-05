@@ -10,32 +10,42 @@
       <FlexboxLayout flexDirection="column">
         <Image :src="photo" loadMode="async" />
         
-        <StackLayout row="3" col="0" class="section">
-          <AppLabel row="0" col="0" :text="city" large />
-          <AppLabel row="1" col="0" :text="area" small />
-          <AppLabel row="2" col="0" :text="time" small />
+        <StackLayout row="2" col="0" class="section">
+          <AppLabel row="0" col="0" :text="city" xLarge />
+          <AppLabel row="1" col="0" :text="area" medium />
         </StackLayout>
 
         <GridLayout v-if="usedStation" rows="60" columns="*, *, *, *" class="section">
           <StackLayout row="0" col="0" backgroundColor="#0f2b4b">
-            <BlockLabel :text="aqi" description="AQI"></BlockLabel>
+            <BlockLabel :text="aqi !== 0 ? aqi : '-'" description="AQI"></BlockLabel>
           </StackLayout>
           <StackLayout row="0" col="1" backgroundColor="#448865">
-            <BlockLabel :text="pressure" description="Pressure"></BlockLabel>
+            <BlockLabel :text="pressure !== 0 ? pressure : '-'" description="Pressure"></BlockLabel>
           </StackLayout>
           <StackLayout row="0" col="2" backgroundColor="#86c078">
-            <BlockLabel :text="no2" description="NO2"></BlockLabel>
+            <BlockLabel :text="no2 !== 0 ? no2 : '-'" description="NO2"></BlockLabel>
           </StackLayout>
           <StackLayout row="0" col="3" backgroundColor="#9fdeb4">
-            <BlockLabel :text="o3" description="O3"></BlockLabel>
+            <BlockLabel :text="o3 !== 0 ? o3 : '-'" description="O3"></BlockLabel>
           </StackLayout>
         </GridLayout>
 
-        <StackLayout v-if="usedStation" row="0" col="0" class="section">
-          <BlockLabel text="Level" :description="level"></BlockLabel>
+        <StackLayout row="0" col="0" class="section">
+          <AppLabel :text="time" xSmall />
         </StackLayout>
+
+        <StackLayout v-if="usedStation" row="2" col="0" class="section">
+          <AppLabel row="0" text="Level" xLarge></AppLabel>
+          <AppLabel row="1" :text="level" medium></AppLabel>
+        </StackLayout>
+        
+        <StackLayout v-if="usedStation" row="2" col="0" class="section">
+          <AppLabel row="0" text="Description" xLarge></AppLabel>
+          <AppLabel row="1" :text="description" medium></AppLabel>
+        </StackLayout>
+
         <StackLayout v-if="usedStation" row="0" col="0" class="section">
-          <BlockLabel text="Implication" :description="description"></BlockLabel>
+          <AppLabel :text="'Powered by https://aqicn.org'" xSmall />
         </StackLayout>
 
       </FlexboxLayout>
@@ -63,16 +73,14 @@ export default {
       o3: 0,
       time: null,
       photo: null,
-      photos: [
-        'https://c2.staticflickr.com/8/7860/45677507625_82c876517b_b.jpg', 
+      photos: [ 
         'https://c2.staticflickr.com/8/7810/32716249988_c9372c3dcc_z.jpg', 
         'https://c2.staticflickr.com/8/7806/44758722720_f1ce7ebb76_z.jpg',
         'https://c1.staticflickr.com/5/4822/45856598474_607e5140fe_z.jpg',
         'https://c2.staticflickr.com/8/7897/31648509197_4968284c82_z.jpg',
-        'https://c1.staticflickr.com/5/4874/46537071502_95459083a2_z.jpg',
-        'https://c1.staticflickr.com/5/4839/45664097635_c07f3b515d_b.jpg',
-        'https://c1.staticflickr.com/5/4880/46372128212_ff34eb26c7_z.jpg',
-        'https://c2.staticflickr.com/8/7851/44770415520_a378784ae2_z.jpg'
+        'https://c2.staticflickr.com/8/7839/32741648258_c2c500e8d3_z.jpg',
+        'https://c2.staticflickr.com/8/7890/31673081187_2aefb13e48_z.jpg',
+        'https://c1.staticflickr.com/5/4911/39648744533_a2ede5a669_z.jpg'
       ]
     }
   },
@@ -87,13 +95,14 @@ export default {
       axios.get(url)
       .then(res => res.data.data)
       .then((data) => {
-        console.info(data)
+        // console.info(data)
         this.usedStation = data.city.name
-        this.pressure = Math.round(data.iaqi.p.v)
-        this.aqi = data.iaqi.pm10.v
-        this.no2 = data.iaqi.no2.v
-        this.time = data.time.s
-        this.o3 = data.iaqi.o3.v
+        
+        if (data.iaqi.p) this.pressure = Math.round(data.iaqi.p.v)
+        if (data.iaqi.pm10) this.aqi = data.iaqi.pm10.v
+        if (data.iaqi.no2) this.no2 = this.no2 = data.iaqi.no2.v
+        if (data.time.s) this.s = this.time = data.time.s
+        if (data.iaqi.o3) this.o3 = this.o3 = data.iaqi.o3.v
       })
     },
     confirmLocation () {
