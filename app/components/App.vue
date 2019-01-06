@@ -7,48 +7,30 @@
     </ActionBar>
 
     <ScrollView orientation="vertical">
-      <FlexboxLayout flexDirection="column">
+      <StackLayout>
         <Image :src="photo" loadMode="async" />
-        
-        <StackLayout row="2" col="0" class="section">
-          <AppLabel row="0" col="0" :text="city" xLarge />
-          <AppLabel row="1" col="0" :text="area" medium />
-        </StackLayout>
+        <StackLayout v-if="usedStation" class="content">
+          
+          <Label textWrap="true" class="h1" :text="city"></Label>
+          <Label textWrap="true" class="h2" :text="area"></Label>
 
-        <GridLayout v-if="usedStation" rows="60" columns="*, *, *, *" class="section">
-          <StackLayout row="0" col="0" backgroundColor="#0f2b4b">
-            <BlockLabel :text="aqi !== 0 ? aqi : '-'" description="AQI"></BlockLabel>
-          </StackLayout>
-          <StackLayout row="0" col="1" backgroundColor="#448865">
-            <BlockLabel :text="pressure !== 0 ? pressure : '-'" description="Pressure"></BlockLabel>
-          </StackLayout>
-          <StackLayout row="0" col="2" backgroundColor="#86c078">
-            <BlockLabel :text="no2 !== 0 ? no2 : '-'" description="NO2"></BlockLabel>
-          </StackLayout>
-          <StackLayout row="0" col="3" backgroundColor="#9fdeb4">
-            <BlockLabel :text="o3 !== 0 ? o3 : '-'" description="O3"></BlockLabel>
-          </StackLayout>
-        </GridLayout>
+          <GridLayout rows="100, 100" columns="*, *" class="section">
+            <BlockLabel row="0" col="0" backgroundColor="#0f2b4b" :text="getValue(aqi)" description="AQI" ></BlockLabel>
+            <BlockLabel row="0" col="1" backgroundColor="#448865" :text="getValue(pressure)" description="Pressure"></BlockLabel>
+            <BlockLabel row="1" col="0" backgroundColor="#86c078" :text="getValue(no2)" description="NO2"></BlockLabel>
+            <BlockLabel row="1" col="1" backgroundColor="#9fdeb4" :text="getValue(o3)" description="O3"></BlockLabel>
+          </GridLayout>
 
-        <StackLayout row="0" col="0" class="section">
-          <AppLabel :text="time" xSmall />
-        </StackLayout>
+          <Label textWrap="true" class="footnote text-right font-italic" :text="time"></Label>
 
-        <StackLayout v-if="usedStation" row="2" col="0" class="section">
-          <AppLabel row="0" text="Level" xLarge></AppLabel>
-          <AppLabel row="1" :text="level" medium></AppLabel>
-        </StackLayout>
-        
-        <StackLayout v-if="usedStation" row="2" col="0" class="section">
-          <AppLabel row="0" text="Description" xLarge></AppLabel>
-          <AppLabel row="1" :text="description" medium></AppLabel>
-        </StackLayout>
+          <Label textWrap="true" class="h1" text="Level"></Label>
+          <Label textWrap="true" class="h3" :text="level"></Label>
 
-        <StackLayout v-if="usedStation" row="0" col="0" class="section">
-          <AppLabel :text="'Powered by https://aqicn.org'" xSmall />
-        </StackLayout>
+          <Label textWrap="true" class="h1" text="Description"></Label>
+          <Label textWrap="true" class="h3" :text="description"></Label>
 
-      </FlexboxLayout>
+        </StackLayout>
+      </StackLayout>
     </ScrollView>
   </Page>
 </template>
@@ -57,7 +39,6 @@
 import axios from 'axios'
 import {isEnabled, enableLocation, getLocation} from '../js/location'
 
-import AppLabel from './AppLabel'
 import BlockLabel from './BlockLabel'
 
 const geolocation = require('nativescript-geolocation')
@@ -85,7 +66,7 @@ export default {
     }
   },
   components: {
-    AppLabel, BlockLabel
+    BlockLabel
   },
   methods: {
     requestAqi ({latitude, longitude}) {
@@ -104,6 +85,9 @@ export default {
         if (data.time.s) this.s = this.time = data.time.s
         if (data.iaqi.o3) this.o3 = this.o3 = data.iaqi.o3.v
       })
+    },
+    getValue (value) {
+      return value === null || value === 0 ? '-' : value
     },
     confirmLocation () {
       return confirm({
@@ -167,10 +151,12 @@ ActionBar {
 }
 Page {
   color: white;
-  font-family: 'Montserrat-Light';
+  /* font-family: 'Montserrat-Light'; */
 }
-
+.content {
+  margin: 0 10px;
+}
 .section {
-  margin: 5px 10px;
+  margin: 5px 0;
 }
 </style>
